@@ -1,5 +1,5 @@
 CC=g++
-FLAGS=-std=c++11 -c
+FLAGS=-std=c++11 -c -fPIC
 LIBS=-lreadline
 
 all:
