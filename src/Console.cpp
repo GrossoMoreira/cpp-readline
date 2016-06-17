@@ -1,5 +1,7 @@
 #include "Console.hpp"
+#include "nargv/nargv.h"
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <functional>
@@ -114,16 +116,36 @@ namespace CppReadline {
     }
 
     int Console::executeCommand(const std::string & command) {
-        // Convert input to vector
-        std::vector<std::string> inputs;
-        {
-            std::istringstream iss(command);
-            std::copy(std::istream_iterator<std::string>(iss),
-                    std::istream_iterator<std::string>(),
-                    std::back_inserter(inputs));
-        }
 
-        if ( inputs.size() == 0 ) return ReturnCode::Ok;
+        // Convert input to vector
+
+	std::unique_ptr<NARGV, void(*)(NARGV*)>	parsedArgs(nargv_parse(command.c_str()), nargv_free);
+
+	switch(parsedArgs->error_code) {
+		case 1: // (provided char* was null)
+			// std::string guarantees this never happens
+			break;
+
+		case 2: // (string was empty)
+			// in this case we simply don't do anything
+			return ReturnCode::Ok;
+			break;
+
+		case 3: // (unterminated double quote)
+			std::cout << "Syntax error: " << parsedArgs->error_message << " at column " << parsedArgs->error_index << std::endl;
+			return ReturnCode::Error;
+			break;
+
+		case 4: // (unterminated single quote)
+			std::cout << "Syntax error: " << parsedArgs->error_message << " at column " << parsedArgs->error_index << std::endl;
+			return ReturnCode::Error;
+			break;
+	}
+
+        std::vector<std::string> inputs;
+
+	for (int i = 0; i < parsedArgs->argc; ++i)
+                inputs.push_back(parsedArgs->argv[i]);
 
         Impl::RegisteredCommands::iterator it;
         if ( ( it = pimpl_->commands_.find(inputs[0]) ) != end(pimpl_->commands_) ) {

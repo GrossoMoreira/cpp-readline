@@ -3,11 +3,11 @@ FLAGS=-std=c++11 -c
 LIBS=-lreadline
 
 all:
-	@mkdir obj
+	@mkdir -p obj
 	${CC} ${FLAGS} src/Console.cpp -o obj/Console.o ${LIBS}
 	${CC} ${FLAGS} src/nargv/nargv.c -o obj/nargv.o ${LIBS}
-	ar rcs cpp-readline.a obj/*
+	ar rcs libcpp-readline.a obj/*
 
 clean:
 	@rm -rf obj
-	@rm -f cpp-readline.a 
+	@rm -f libcpp-readline.a 
