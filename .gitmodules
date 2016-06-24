@@ -1,3 +1,3 @@
 [submodule "src/nargv"]
 	path = src/nargv
-	url = git@github.com:GrossoMoreira/nargv.git
+	url = https://github.com/GrossoMoreira/nargv.git
